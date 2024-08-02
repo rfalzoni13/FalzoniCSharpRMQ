@@ -65,9 +65,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Consumers\ConsumerAbstract.cs" />
-    <Compile Include="Consumers\Product\ProductDataConsumer.cs" />
-    <Compile Include="Consumers\Product\ProductLogConsumer.cs" />
+    <Compile Include="Workers\ConsumerWorker.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

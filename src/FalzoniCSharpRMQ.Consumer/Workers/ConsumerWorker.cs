@@ -1,16 +1,17 @@
 ﻿using FalzoniCSharpRMQ.Common.Config;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using System;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FalzoniCSharpRMQ.Consumer.Consumers
+namespace FalzoniCSharpRMQ.Consumer.Workers
 {
-    internal abstract class ConsumerAbstract
+    public class ConsumerWorker
     {
-        internal virtual void Consume(string exchangeName, string exchangeType, string queueName, string routingKey)
+        public virtual string Consume(string exchangeName, string exchangeType, string queueName, string routingKey)
         {
+            string message = null;
+
             IModel channel = RabbitMQConfig.GetChannel(exchangeName, exchangeType, queueName, routingKey);
 
             var consumer = new EventingBasicConsumer(channel);
@@ -21,9 +22,7 @@ namespace FalzoniCSharpRMQ.Consumer.Consumers
                 // and process the message
                 // ...
 
-                var message = Encoding.UTF8.GetString(body);
-
-                Console.WriteLine("Recebida a mensagem: " + message);
+                message = Encoding.UTF8.GetString(body);
 
                 channel.BasicAck(ea.DeliveryTag, false);
             };
@@ -31,11 +30,16 @@ namespace FalzoniCSharpRMQ.Consumer.Consumers
             // this consumer tag identifies the subscription
             // when it has to be cancelled
             channel.BasicConsume(queueName, false, consumer);
+
+            return message;
         }
 
-        internal virtual void AsyncConsume(string exchangeName, string exchangeType, string queueName, string routingKey)
+        public virtual string AsyncConsume(string exchangeName, string exchangeType, string queueName, string routingKey)
         {
+            string message = null;
+
             IModel channel = RabbitMQConfig.GetChannel(exchangeName, exchangeType, queueName, routingKey);
+            
             var consumer = new AsyncEventingBasicConsumer(channel);
             consumer.Received += async (ch, ea) =>
             {
@@ -44,6 +48,8 @@ namespace FalzoniCSharpRMQ.Consumer.Consumers
                 // and process the message
                 // ...
 
+                message = Encoding.UTF8.GetString(body);
+
                 channel.BasicAck(ea.DeliveryTag, false);
                 await Task.Yield();
             };
@@ -51,6 +57,8 @@ namespace FalzoniCSharpRMQ.Consumer.Consumers
             // this consumer tag identifies the subscription
             // when it has to be cancelled
             string consumerTag = channel.BasicConsume(queueName, false, consumer);
+
+            return message;
         }
     }
 }

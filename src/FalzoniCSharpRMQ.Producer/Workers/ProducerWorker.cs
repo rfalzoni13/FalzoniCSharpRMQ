@@ -1,26 +1,11 @@
 ﻿using FalzoniCSharpRMQ.Common.Config;
 using RabbitMQ.Client;
 
-namespace FalzoniCSharpRMQ.Producer.Producers
+namespace FalzoniCSharpRMQ.Producer.Workers
 {
-    internal abstract class ProducerAbstract
+    public class ProducerWorker
     {
-        internal virtual void ProduceDirect(string message, string queueName, string routingKey)
-        {
-            Produce(message, RabbitMQAttributes.EXG_DIRECT_NAME, queueName, ExchangeType.Direct, routingKey);
-        }
-
-        internal virtual void ProduceTopic(string message, string queueName, string routingKey)
-        {
-            Produce(message, RabbitMQAttributes.EXG_TOPIC_NAME, queueName, ExchangeType.Topic, routingKey);
-        }
-
-        internal virtual void ProduceFanout(string message, string queueName)
-        {
-            Produce(message, RabbitMQAttributes.EXG_FANOUT_NAME, queueName, ExchangeType.Fanout, null);
-        }
-
-        private void Produce(string message, string exchangeName, string queueName, string exchangeType, string routingKey)
+        public virtual void Produce(string message, string exchangeName, string queueName, string exchangeType, string routingKey)
         {
             IModel channel = RabbitMQConfig.GetChannel(exchangeName, exchangeType, queueName, routingKey);
 
