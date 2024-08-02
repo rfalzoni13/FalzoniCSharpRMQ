@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FalzoniCSharpRMQ.Producer",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FalzoniCSharpRMQ.Consumer", "src\FalzoniCSharpRMQ.Consumer\FalzoniCSharpRMQ.Consumer.csproj", "{CF87BFD5-155D-4713-8463-56728E38FA60}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FalzoniCSharpRMQ.Tests", "test\FalzoniCSharpRMQ.Tests\FalzoniCSharpRMQ.Tests.csproj", "{C0FF1525-5A21-49A3-8B0B-22A8576AAF93}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{CF87BFD5-155D-4713-8463-56728E38FA60}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CF87BFD5-155D-4713-8463-56728E38FA60}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CF87BFD5-155D-4713-8463-56728E38FA60}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C0FF1525-5A21-49A3-8B0B-22A8576AAF93}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C0FF1525-5A21-49A3-8B0B-22A8576AAF93}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C0FF1525-5A21-49A3-8B0B-22A8576AAF93}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C0FF1525-5A21-49A3-8B0B-22A8576AAF93}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
