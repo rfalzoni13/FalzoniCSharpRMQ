@@ -2,6 +2,7 @@
 using FalzoniCSharpRMQ.Consumer.Workers;
 using RabbitMQ.Client;
 using System;
+using System.Collections.Generic;
 
 namespace FalzoniCSharpRMQ.Consumer
 {
@@ -9,21 +10,22 @@ namespace FalzoniCSharpRMQ.Consumer
     {
         static void Main(string[] args)
         {
+            List<string> messages = new List<string>();
+
             try
             {
                 Console.WriteLine("Criando novo consumer");
-                var c1 = new ConsumerWorker();
+                var consumer = new ConsumerWorker();
 
                 Console.WriteLine("Cosumindo mensagens");
-                string returnLog = c1.Consume(RabbitMQAttributes.EXG_DIRECT_NAME, RabbitMQAttributes.QUEUE_PRODUCT_LOG, ExchangeType.Direct, RabbitMQAttributes.RK_PRODUCT_LOG);
-                Console.WriteLine("Recebida a mensagem: " + returnLog);
-                Console.WriteLine("Processo concluído!");
 
-                var c2 = new ConsumerWorker();
-                Console.WriteLine("Cosumindo mensagens");
-                string returnData = c2.Consume(RabbitMQAttributes.EXG_TOPIC_NAME, RabbitMQAttributes.QUEUE_PRODUCT_DATA, ExchangeType.Topic, RabbitMQAttributes.RK_PRODUCT_DATA);
-                Console.WriteLine("Recebida a mensagem: " + returnData);
-                Console.WriteLine("Processo concluído!");
+                // Consumo de todas as mensagens
+                MessageWorker.ConsumeAllMessages(consumer, new string[] { RabbitMQAttributes.QUEUE_PRODUCT_DATA, RabbitMQAttributes.QUEUE_PRODUCT_LOG });
+                //MessageWorker.ConsumeAllMessagesAsync(consumer, new string[] { RabbitMQAttributes.QUEUE_PRODUCT_DATA, RabbitMQAttributes.QUEUE_PRODUCT_LOG });
+
+                // Consumo de mensagens individuais
+                //MessageWorker.ConsumeSingleMessage(consumer, RabbitMQAttributes.QUEUE_PRODUCT_DATA);
+                //MessageWorker.ConsumeSingleMessage(consumer, RabbitMQAttributes.QUEUE_PRODUCT_LOG);
 
                 Console.ReadLine();
             }

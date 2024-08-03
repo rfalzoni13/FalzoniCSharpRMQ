@@ -23,6 +23,7 @@ namespace FalzoniCSharpRMQ.Producer
                 
                 Console.WriteLine("Enviando mensagem");
                 p2.Produce("Teste de mensagem Topic", RabbitMQAttributes.EXG_TOPIC_NAME, RabbitMQAttributes.QUEUE_PRODUCT_LOG, ExchangeType.Topic, RabbitMQAttributes.RK_PRODUCT_LOG);
+                p2.Produce("Teste de mensagem Topic para todos", RabbitMQAttributes.EXG_TOPIC_NAME, RabbitMQAttributes.QUEUE_PRODUCT_LOG, ExchangeType.Topic, RabbitMQAttributes.RK_PRODUCT_ALL);
                 Console.WriteLine("Processo concluído!");
 
                 Console.WriteLine("Criando novo producer do exchange Fanout");
