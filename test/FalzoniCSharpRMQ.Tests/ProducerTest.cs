@@ -25,7 +25,7 @@ namespace FalzoniCSharpRMQ.Tests
         [TestMethod]
         public void TestRunProducer_Direct_Success()
         {
-            ProducerWorker obj = TestUtils<ProducerWorker>.SetupMock(_mock, _predicate);
+            ProducerWorker obj = TestUtils<ProducerWorker, string>.SetupMock(_mock, _predicate);
 
             obj.Produce("Teste de mensagem Direct", RabbitMQAttributes.EXG_DIRECT_NAME, RabbitMQAttributes.QUEUE_PRODUCT_DATA, "direct", RabbitMQAttributes.RK_PRODUCT_DATA);
 
@@ -38,7 +38,7 @@ namespace FalzoniCSharpRMQ.Tests
         {
             try
             {
-                ProducerWorker obj = TestUtils<ProducerWorker>.SetupExceptionMock(_mock, _predicate);
+                ProducerWorker obj = TestUtils<ProducerWorker, string>.SetupExceptionMock(_mock, _predicate);
                 obj.Produce("Teste de mensagem Direct", RabbitMQAttributes.EXG_DIRECT_NAME, RabbitMQAttributes.QUEUE_PRODUCT_DATA, "direct", RabbitMQAttributes.RK_PRODUCT_DATA);
             }
             catch (Exception)
@@ -51,7 +51,7 @@ namespace FalzoniCSharpRMQ.Tests
         [TestMethod]
         public void TestRunProducer_Fanout_Success()
         {
-            ProducerWorker obj = TestUtils<ProducerWorker>.SetupMock(_mock, _predicate);
+            ProducerWorker obj = TestUtils<ProducerWorker, string>.SetupMock(_mock, _predicate);
 
             obj.Produce("Teste de mensagem Fanout", RabbitMQAttributes.EXG_FANOUT_NAME, RabbitMQAttributes.QUEUE_PRODUCT_LOG, "fanout", string.Empty);
 
@@ -64,7 +64,7 @@ namespace FalzoniCSharpRMQ.Tests
         {
             try
             {
-                ProducerWorker obj = TestUtils<ProducerWorker>.SetupExceptionMock(_mock, _predicate);
+                ProducerWorker obj = TestUtils<ProducerWorker, string>.SetupExceptionMock(_mock, _predicate);
                 obj.Produce("Teste de mensagem Fanout", RabbitMQAttributes.EXG_FANOUT_NAME, RabbitMQAttributes.QUEUE_PRODUCT_LOG, "fanout", string.Empty);
             }
             catch (Exception)
@@ -77,7 +77,7 @@ namespace FalzoniCSharpRMQ.Tests
         [TestMethod]
         public void TestRunProducer_Topic_Success()
         {
-            ProducerWorker obj = TestUtils<ProducerWorker>.SetupMock(_mock, _predicate);
+            ProducerWorker obj = TestUtils<ProducerWorker, string>.SetupMock(_mock, _predicate);
 
             obj.Produce("Teste de mensagem Topic", RabbitMQAttributes.EXG_TOPIC_NAME, RabbitMQAttributes.QUEUE_PRODUCT_LOG, "topic", RabbitMQAttributes.RK_PRODUCT_LOG);
 
@@ -90,7 +90,7 @@ namespace FalzoniCSharpRMQ.Tests
         {
             try
             {
-                ProducerWorker obj = TestUtils<ProducerWorker>.SetupExceptionMock(_mock, _predicate);
+                ProducerWorker obj = TestUtils<ProducerWorker, string>.SetupExceptionMock(_mock, _predicate);
                 obj.Produce("Teste de mensagem Topic", RabbitMQAttributes.EXG_TOPIC_NAME, RabbitMQAttributes.QUEUE_PRODUCT_LOG, "topic", RabbitMQAttributes.RK_PRODUCT_LOG);
             }
             catch(Exception)

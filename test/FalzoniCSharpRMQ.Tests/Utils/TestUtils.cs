@@ -1,11 +1,14 @@
 ﻿using Moq;
-using System.Linq.Expressions;
 using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace FalzoniCSharpRMQ.Tests.Utils
 {
-    public static class TestUtils<T>
+    public static class TestUtils<T, TResult>
         where T : class
+        where TResult : class
     {
         public static T SetupMock(Mock<T> mock, Expression<Action<T>> predicate)
         {
@@ -17,6 +20,13 @@ namespace FalzoniCSharpRMQ.Tests.Utils
         public static T SetupReturnMock(Mock<T> mock, Expression<Func<T, object>> predicate, object ret)
         {
             mock.Setup(predicate).Returns(ret);
+
+            return mock.Object;
+        }
+
+        public static T SetupReturnMockAsync(Mock<T> mock, Expression<Func<T, Task>> predicate, TResult ret)
+        {
+            mock.Setup(predicate).Returns(Task.FromResult<TResult>(ret));
 
             return mock.Object;
         }

@@ -4,83 +4,209 @@ using FalzoniCSharpRMQ.Tests.Utils;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace FalzoniCSharpRMQ.Tests
 {
     [TestClass]
     public class ConsumerTest
     {
-
+        private List<string> _list;
         private Mock<ConsumerWorker> _mock;
-        private Expression<Func<ConsumerWorker, object>> _predicate;
+        private Expression<Func<ConsumerWorker, object>> _predicateSingle;
+        private Expression<Func<ConsumerWorker, object>> _predicateAll;
+        private Expression<Func<ConsumerWorker, Task>> _predicateAllAsync;
 
         [TestInitialize]
         public void TestInitialize()
         {
             _mock = new Mock<ConsumerWorker>();
 
-            _predicate = m => m.Consume(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>());
+            _predicateSingle = m => m.Consume(It.IsAny<string>());
+            _predicateAll = m => m.ConsumeAll(It.IsAny<string>());
+            _predicateAllAsync = m => m.ConsumeAllAsync(It.IsAny<string>());
         }
 
         [TestMethod]
-        public void TestRunConsumer_Direct_Success()
+        public void TestRunConsumerAll_Success()
         {
-            ConsumerWorker obj = TestUtils<ConsumerWorker>.SetupReturnMock(_mock, _predicate, "Teste de mensagem Direct");
+            _list = new List<string>() 
+            { 
+                "Teste de mensagem Direct", 
+                "Teste de mensagem Fanout",
+                "Teste de mensagem Topic"
+            };
 
-            var message = obj.Consume(RabbitMQAttributes.EXG_DIRECT_NAME, "direct", RabbitMQAttributes.QUEUE_PRODUCT_DATA, RabbitMQAttributes.RK_PRODUCT_DATA);
+            ConsumerWorker obj = TestUtils<ConsumerWorker, List<string>>.SetupReturnMock(_mock, _predicateAll, _list);
 
-            Assert.AreEqual("Teste de mensagem Direct", message);
+            var messages = obj.ConsumeAll(RabbitMQAttributes.QUEUE_PRODUCT_DATA);
+
+            Assert.AreEqual(messages, _list);
         }
 
         [TestMethod]
-        public void TestRunConsumer_Fanout_Success()
+        public void TestRunConsumerAllAsync_Success()
         {
-            ConsumerWorker obj = TestUtils<ConsumerWorker>.SetupReturnMock(_mock, _predicate, "Teste de mensagem Fanout");
+            _list = new List<string>()
+            {
+                "Teste de mensagem Direct",
+                "Teste de mensagem Fanout",
+                "Teste de mensagem Topic"
+            };
 
-            string message = obj.Consume(RabbitMQAttributes.EXG_FANOUT_NAME, "fanout", RabbitMQAttributes.QUEUE_PRODUCT_LOG, string.Empty);
+            ConsumerWorker obj = TestUtils<ConsumerWorker, List<string>>.SetupReturnMockAsync(_mock, _predicateAllAsync, _list);
 
-            Assert.AreEqual("Teste de mensagem Fanout", message);
+            var messages = obj.ConsumeAllAsync(RabbitMQAttributes.QUEUE_PRODUCT_DATA).Result;
+
+            Assert.AreEqual(messages, _list);
         }
 
         [TestMethod]
-        public void TestRunConsumer_Topic_Success()
+        public void TestRunConsumerAll_Error()
         {
-            ConsumerWorker obj = TestUtils<ConsumerWorker>.SetupReturnMock(_mock, _predicate, "Teste de mensagem Topic");
+            _list = new List<string>()
+            {
+                "Teste de mensagem Direct",
+                "Teste de mensagem Fanout",
+                "Teste de mensagem Topic"
+            };
 
-            string message = obj.Consume(RabbitMQAttributes.EXG_TOPIC_NAME, "topic", RabbitMQAttributes.QUEUE_PRODUCT_DATA, RabbitMQAttributes.RK_PRODUCT_DATA);
+            ConsumerWorker obj = TestUtils<ConsumerWorker, List<string>>.SetupReturnMock(_mock, _predicateAll, _list);
 
-            Assert.AreEqual("Teste de mensagem Topic", message);
+            var messages = obj.ConsumeAll(RabbitMQAttributes.QUEUE_PRODUCT_DATA);
+
+            Assert.AreNotEqual(messages, new List<string>() 
+            { 
+                "Teste de mensagem Direct",
+                "Teste de mensagem Fanout",
+                "Teste de mensagem Topic" 
+            });
         }
 
         [TestMethod]
-        public void TestRunConsumer_Direct_Error()
-        { 
-            ConsumerWorker obj = TestUtils<ConsumerWorker>.SetupReturnMock(_mock, _predicate, "Teste");
-
-            var message = obj.Consume(RabbitMQAttributes.EXG_DIRECT_NAME, "direct", RabbitMQAttributes.QUEUE_PRODUCT_DATA, RabbitMQAttributes.RK_PRODUCT_DATA);
-
-            Assert.AreNotEqual("Teste de mensagem Direct", message);
-        }
-
-        [TestMethod]
-        public void TestRunConsumer_Fanout_Error()
+        public void TestRunConsumerAllAsync_Error()
         {
-            ConsumerWorker obj = TestUtils<ConsumerWorker>.SetupReturnMock(_mock, _predicate, "Teste");
+            _list = new List<string>()
+            {
+                "Teste de mensagem Direct",
+                "Teste de mensagem Fanout",
+                "Teste de mensagem Topic"
+            };
 
-            string message = obj.Consume(RabbitMQAttributes.EXG_FANOUT_NAME, "fanout", RabbitMQAttributes.QUEUE_PRODUCT_LOG, string.Empty);
+            ConsumerWorker obj = TestUtils<ConsumerWorker, List<string>>.SetupReturnMockAsync(_mock, _predicateAllAsync, _list);
 
-            Assert.AreNotEqual("Teste de mensagem Fanout", message);
+            var messages = obj.ConsumeAllAsync(RabbitMQAttributes.QUEUE_PRODUCT_DATA).Result;
+
+            Assert.AreNotEqual(messages, new List<string>()
+            {
+                "Teste de mensagem Direct",
+                "Teste de mensagem Fanout",
+                "Teste de mensagem Topic"
+            });
         }
 
         [TestMethod]
-        public void TestRunConsumer_Topic_Error()
+        [ExpectedException(typeof(AssertFailedException))]
+        public void TestRunConsumerAll_Fail()
         {
-            ConsumerWorker obj = TestUtils<ConsumerWorker>.SetupReturnMock(_mock, _predicate, "Teste");
+            try
+            {
+                ConsumerWorker obj = TestUtils<ConsumerWorker, List<string>>.SetupExceptionReturnMock(_mock, _predicateAll);
+                obj.ConsumeAll(RabbitMQAttributes.QUEUE_PRODUCT_LOG);
+            }
+            catch (Exception)
+            {
+                Assert.Fail();
+            }
+        }
 
-            string message = obj.Consume(RabbitMQAttributes.EXG_TOPIC_NAME, "topic", RabbitMQAttributes.QUEUE_PRODUCT_DATA, null);
+        [TestMethod]
+        [ExpectedException(typeof(AssertFailedException))]
+        public void TestRunConsumerAllAsync_Fail()
+        {
+            try
+            {
+                ConsumerWorker obj = TestUtils<ConsumerWorker, List<string>>.SetupExceptionReturnMock(_mock, _predicateSingle);
+                obj.ConsumeAllAsync(RabbitMQAttributes.QUEUE_PRODUCT_LOG).RunSynchronously();
+            }
+            catch (Exception)
+            {
+                Assert.Fail();
+            }
+        }
 
-            Assert.AreNotEqual("Teste de mensagem Topic", message);
+        [TestMethod]
+        public void TestRunConsumerSingle_Direct_Success()
+        {
+            _list = new List<string>() { "Teste de mensagem Direct" };
+
+            ConsumerWorker obj = TestUtils<ConsumerWorker, List<string>>.SetupReturnMock(_mock, _predicateSingle, _list);
+
+            var messages = obj.Consume(RabbitMQAttributes.QUEUE_PRODUCT_DATA);
+
+            Assert.AreEqual(messages, _list);
+        }
+
+        [TestMethod]
+        public void TestRunConsumerSingle_Fanout_Success()
+        {
+            _list = new List<string>() { "Teste de mensagem Fanout" };
+
+            ConsumerWorker obj = TestUtils<ConsumerWorker, List<string>>.SetupReturnMock(_mock, _predicateSingle, _list);
+
+            var messages = obj.Consume(RabbitMQAttributes.QUEUE_PRODUCT_DATA);
+
+            Assert.AreEqual(messages, _list);
+        }
+
+        [TestMethod]
+        public void TestRunConsumerSingle_Topic_Success()
+        {
+            _list = new List<string>() { "Teste de mensagem Topic" };
+
+            ConsumerWorker obj = TestUtils<ConsumerWorker, List<string>>.SetupReturnMock(_mock, _predicateSingle, _list);
+
+            var messages = obj.Consume(RabbitMQAttributes.QUEUE_PRODUCT_LOG);
+
+            Assert.AreEqual(messages, _list);
+        }
+
+        [TestMethod]
+        public void TestRunConsumerSingle_Direct_Error()
+        {
+            _list = new List<string>() { "Teste de mensagem Direct" };
+
+            ConsumerWorker obj = TestUtils<ConsumerWorker, List<string>>.SetupReturnMock(_mock, _predicateSingle, _list);
+
+            var messages = obj.Consume(RabbitMQAttributes.QUEUE_PRODUCT_LOG);
+
+            Assert.AreNotEqual(messages, new List<string>() { "Teste de mensagem Direct" });
+        }
+
+        [TestMethod]
+        public void TestRunConsumerSingle_Fanout_Error()
+        {
+            _list = new List<string>() { "Teste de mensagem Fanout" };
+
+            ConsumerWorker obj = TestUtils<ConsumerWorker, List<string>>.SetupReturnMock(_mock, _predicateSingle, _list);
+
+            var messages = obj.Consume(RabbitMQAttributes.QUEUE_PRODUCT_DATA);
+
+            Assert.AreNotEqual(messages, new List<string>() { "Teste de mensagem Fanout" });
+        }
+
+        [TestMethod]
+        public void TestRunConsumerSingle_Topic_Error()
+        {
+            _list = new List<string>() { "Teste de mensagem Topic" };
+
+            ConsumerWorker obj = TestUtils<ConsumerWorker, List<string>>.SetupReturnMock(_mock, _predicateSingle, _list);
+
+            var messages = obj.Consume(RabbitMQAttributes.QUEUE_PRODUCT_LOG);
+
+            Assert.AreNotEqual(messages, new List<string>() { "Teste de mensagem Topic" });
         }
 
         [TestMethod]
@@ -89,8 +215,8 @@ namespace FalzoniCSharpRMQ.Tests
         {
             try
             {
-                ConsumerWorker obj = TestUtils<ConsumerWorker>.SetupExceptionReturnMock(_mock, _predicate);
-                obj.Consume(RabbitMQAttributes.EXG_DIRECT_NAME, "direct", RabbitMQAttributes.QUEUE_PRODUCT_DATA, RabbitMQAttributes.RK_PRODUCT_DATA);
+                ConsumerWorker obj = TestUtils<ConsumerWorker, List<string>>.SetupExceptionReturnMock(_mock, _predicateSingle);
+                obj.Consume(RabbitMQAttributes.QUEUE_PRODUCT_DATA);
             }
             catch (Exception)
             {
@@ -105,8 +231,8 @@ namespace FalzoniCSharpRMQ.Tests
         {
             try
             {
-                ConsumerWorker obj = TestUtils<ConsumerWorker>.SetupExceptionReturnMock(_mock, _predicate);
-                obj.Consume(RabbitMQAttributes.EXG_FANOUT_NAME, "fanout", RabbitMQAttributes.QUEUE_PRODUCT_DATA, string.Empty);
+                ConsumerWorker obj = TestUtils<ConsumerWorker, List<string>>.SetupExceptionReturnMock(_mock, _predicateSingle);
+                obj.Consume(RabbitMQAttributes.QUEUE_PRODUCT_LOG);
             }
             catch (Exception)
             {
@@ -121,8 +247,8 @@ namespace FalzoniCSharpRMQ.Tests
         {
             try
             {
-                ConsumerWorker obj = TestUtils<ConsumerWorker>.SetupExceptionReturnMock(_mock, _predicate);
-                obj.Consume(RabbitMQAttributes.EXG_TOPIC_NAME, "topic", RabbitMQAttributes.QUEUE_PRODUCT_LOG, RabbitMQAttributes.RK_PRODUCT_LOG);
+                ConsumerWorker obj = TestUtils<ConsumerWorker, List<string>>.SetupExceptionReturnMock(_mock, _predicateSingle);
+                obj.Consume(RabbitMQAttributes.QUEUE_PRODUCT_DATA);
             }
             catch (Exception)
             {
