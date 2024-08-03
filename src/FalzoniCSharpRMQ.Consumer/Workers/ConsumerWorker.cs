@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
-using System.Threading.Channels;
 using System.Threading.Tasks;
 
 namespace FalzoniCSharpRMQ.Consumer.Workers
@@ -32,7 +31,7 @@ namespace FalzoniCSharpRMQ.Consumer.Workers
             if (result == null)
             {
                 _messages.Add("Nenhuma mensagem nesta fila");
-
+                return _messages;
             }
 
             IBasicProperties props = result.BasicProperties;

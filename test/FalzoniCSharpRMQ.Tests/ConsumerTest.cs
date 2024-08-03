@@ -15,8 +15,8 @@ namespace FalzoniCSharpRMQ.Tests
     {
         private List<string> _list;
         private Mock<ConsumerWorker> _mock;
-        private Expression<Func<ConsumerWorker, object>> _predicateSingle;
-        private Expression<Func<ConsumerWorker, object>> _predicateAll;
+        private Expression<Func<ConsumerWorker, List<string>>> _predicateSingle;
+        private Expression<Func<ConsumerWorker, List<string>>> _predicateAll;
         private Expression<Func<ConsumerWorker, Task>> _predicateAllAsync;
 
         [TestInitialize]
@@ -128,7 +128,7 @@ namespace FalzoniCSharpRMQ.Tests
         {
             try
             {
-                ConsumerWorker obj = TestUtils<ConsumerWorker, List<string>>.SetupExceptionReturnMock(_mock, _predicateSingle);
+                ConsumerWorker obj = TestUtils<ConsumerWorker, List<string>>.SetupExceptionMockAsync(_mock, _predicateAllAsync);
                 obj.ConsumeAllAsync(RabbitMQAttributes.QUEUE_PRODUCT_LOG).RunSynchronously();
             }
             catch (Exception)
@@ -211,39 +211,7 @@ namespace FalzoniCSharpRMQ.Tests
 
         [TestMethod]
         [ExpectedException(typeof(AssertFailedException))]
-        public void TestRunProducer_Direct_Fail()
-        {
-            try
-            {
-                ConsumerWorker obj = TestUtils<ConsumerWorker, List<string>>.SetupExceptionReturnMock(_mock, _predicateSingle);
-                obj.Consume(RabbitMQAttributes.QUEUE_PRODUCT_DATA);
-            }
-            catch (Exception)
-            {
-                Assert.Fail();
-            }
-
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(AssertFailedException))]
-        public void TestRunProducer_Fanout_Fail()
-        {
-            try
-            {
-                ConsumerWorker obj = TestUtils<ConsumerWorker, List<string>>.SetupExceptionReturnMock(_mock, _predicateSingle);
-                obj.Consume(RabbitMQAttributes.QUEUE_PRODUCT_LOG);
-            }
-            catch (Exception)
-            {
-                Assert.Fail();
-            }
-
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(AssertFailedException))]
-        public void TestRunProducer_Topic_Fail()
+        public void TestRunProducerSingle_Fail()
         {
             try
             {

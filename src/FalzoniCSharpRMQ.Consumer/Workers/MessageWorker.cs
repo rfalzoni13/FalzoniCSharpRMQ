@@ -1,7 +1,6 @@
-﻿using FalzoniCSharpRMQ.Common.Config;
-using System;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace FalzoniCSharpRMQ.Consumer.Workers
 {
@@ -33,7 +32,7 @@ namespace FalzoniCSharpRMQ.Consumer.Workers
             PrintMessages(messages);
         }
 
-        internal static async void ConsumeAllMessagesAsync(ConsumerWorker consumer, string[] queues)
+        internal static async Task ConsumeAllMessagesAsync(ConsumerWorker consumer, string[] queues)
         {
             List<string> messages = new List<string>();
 

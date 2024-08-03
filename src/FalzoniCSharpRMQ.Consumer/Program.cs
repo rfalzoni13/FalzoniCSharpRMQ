@@ -1,6 +1,5 @@
 ﻿using FalzoniCSharpRMQ.Common.Config;
 using FalzoniCSharpRMQ.Consumer.Workers;
-using RabbitMQ.Client;
 using System;
 using System.Collections.Generic;
 
@@ -10,8 +9,6 @@ namespace FalzoniCSharpRMQ.Consumer
     {
         static void Main(string[] args)
         {
-            List<string> messages = new List<string>();
-
             try
             {
                 Console.WriteLine("Criando novo consumer");
